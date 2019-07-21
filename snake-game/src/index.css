@@ -1,0 +1,25 @@
+.maze {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  border: 2px solid #000;
+  margin: 50px auto;
+}
+
+.snake-dot {
+  position: absolute;
+  width: 2%;
+  height: 2%;
+  background-color: #000;
+  border: 1px solid #fff;
+  z-index: 2;
+}
+
+.target {
+  position: absolute;
+  width: 2%;
+  height: 2%;
+  background: black;
+  border: 1px solid #fff;
+  z-index: 1;
+}
