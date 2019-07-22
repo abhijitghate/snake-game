@@ -13,12 +13,28 @@ class App extends Component {
       ],
       snakeBody: [[0, 0], [2, 0]],
       speed: 100,
-      direction: "RIGHT"
+      direction: "RIGHT",
+      play_pause: true,
+      gameState: ""
     };
   }
 
+  playPause = () => {
+    let play_pause = this.state.play_pause;
+    console.log(play_pause);
+    if (play_pause) {
+      this.setState({
+        gameState: setInterval(this.moveSnake, this.state.speed)
+      });
+    } else {
+      clearInterval(this.state.gameState);
+    }
+    this.setState({
+      play_pause: !play_pause
+    });
+  };
+
   componentDidMount() {
-    setInterval(this.moveSnake, this.state.speed);
     document.onkeydown = this.changeSnakeDirection;
   }
 
@@ -29,16 +45,24 @@ class App extends Component {
   ifEaten = () => {
     let head = this.state.snakeBody[this.state.snakeBody.length - 1];
     let target = this.state.targetLocation;
-    console.log(head, target);
+    let speed = this.state.speed;
     if (head[0] == target[0] && head[1] == target[1]) {
       this.setState((state, props) => {
         snakeBody: state.snakeBody.push(target);
       });
+      speed = speed * 0.95;
+      if (speed < 50) {
+        speed = 20;
+      }
+      clearInterval(this.state.gameState);
+
       this.setState({
         targetLocation: [
           Math.floor((Math.random().toFixed(2) * 100) / 2) * 2,
           Math.floor((Math.random().toFixed(2) * 100) / 2) * 2
-        ]
+        ],
+        speed: speed,
+        gameState: setInterval(this.moveSnake, speed)
       });
     }
   };
@@ -101,9 +125,16 @@ class App extends Component {
 
   render() {
     return (
-      <div className="maze">
-        <Snake snakeBody={this.state.snakeBody} />
-        <Target target={this.state.targetLocation} />
+      <div>
+        <div className="maze">
+          <Snake snakeBody={this.state.snakeBody} />
+          <Target target={this.state.targetLocation} />
+        </div>
+        <div>
+          <button className="controlButtons" onClick={this.playPause}>
+            Play/Pause
+          </button>
+        </div>
       </div>
     );
   }
