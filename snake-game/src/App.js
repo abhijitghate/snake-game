@@ -3,27 +3,26 @@ import { Component } from "react";
 import Snake from "./Snake";
 import Target from "./Target";
 var bestScore = 0;
-
+var initState = {
+  targetLocation: [
+    Math.floor((Math.random().toFixed(2) * 98) / 2) * 2,
+    Math.floor((Math.random().toFixed(2) * 98) / 2) * 2
+  ],
+  snakeBody: [[0, 0], [2, 0]],
+  speed: 100,
+  direction: "RIGHT",
+  play_pause: true,
+  gameState: "",
+  score: 0
+};
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      targetLocation: [
-        Math.floor((Math.random().toFixed(2) * 98) / 2) * 2,
-        Math.floor((Math.random().toFixed(2) * 98) / 2) * 2
-      ],
-      snakeBody: [[0, 0], [2, 0]],
-      speed: 100,
-      direction: "RIGHT",
-      play_pause: true,
-      gameState: "",
-      score: 0
-    };
+    this.state = initState;
   }
 
   playPause = () => {
     let play_pause = this.state.play_pause;
-    console.log(play_pause);
     if (play_pause) {
       this.setState({
         gameState: setInterval(this.moveSnake, this.state.speed)
@@ -41,8 +40,24 @@ class App extends Component {
   }
 
   componentDidUpdate() {
+    this.bitItself();
     this.ifEaten();
   }
+
+  bitItself = () => {
+    let body = [...this.state.snakeBody];
+    let head = body[body.length - 1];
+    body.pop();
+    body.forEach(x => {
+      if (head[0] == x[0] && head[1] == x[1]) {
+        console.log(true);
+        // console.log(body);
+        // console.log(head);
+        clearInterval(this.state.gameState);
+        this.setState(initState);
+      }
+    });
+  };
 
   ifEaten = () => {
     let head = this.state.snakeBody[this.state.snakeBody.length - 1];
@@ -50,8 +65,10 @@ class App extends Component {
     let speed = this.state.speed;
     let score = this.state.score;
     if (head[0] == target[0] && head[1] == target[1]) {
-      this.setState((state, props) => {
-        snakeBody: state.snakeBody.push(target);
+      let newBody = this.state.snakeBody;
+      newBody.unshift([]);
+      this.setState({
+        snakeBody: newBody
       });
       speed = speed * 0.95;
       score = score + 1;
