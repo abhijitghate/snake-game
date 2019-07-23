@@ -2,6 +2,7 @@ import React from "react";
 import { Component } from "react";
 import Snake from "./Snake";
 import Target from "./Target";
+var bestScore = 0;
 
 class App extends Component {
   constructor(props) {
@@ -15,7 +16,8 @@ class App extends Component {
       speed: 100,
       direction: "RIGHT",
       play_pause: true,
-      gameState: ""
+      gameState: "",
+      score: 0
     };
   }
 
@@ -46,11 +48,16 @@ class App extends Component {
     let head = this.state.snakeBody[this.state.snakeBody.length - 1];
     let target = this.state.targetLocation;
     let speed = this.state.speed;
+    let score = this.state.score;
     if (head[0] == target[0] && head[1] == target[1]) {
       this.setState((state, props) => {
         snakeBody: state.snakeBody.push(target);
       });
       speed = speed * 0.95;
+      score = score + 1;
+      if (score > bestScore) {
+        bestScore = score;
+      }
       if (speed < 50) {
         speed = 20;
       }
@@ -62,7 +69,8 @@ class App extends Component {
           Math.floor((Math.random().toFixed(2) * 100) / 2) * 2
         ],
         speed: speed,
-        gameState: setInterval(this.moveSnake, speed)
+        gameState: setInterval(this.moveSnake, speed),
+        score: score
       });
     }
   };
@@ -134,6 +142,8 @@ class App extends Component {
           <button className="controlButtons" onClick={this.playPause}>
             Play/Pause
           </button>
+          <p>Score:{this.state.score}</p>
+          <p>Best Score:{bestScore}</p>
         </div>
       </div>
     );
