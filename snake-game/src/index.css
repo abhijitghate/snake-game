@@ -24,6 +24,15 @@
   z-index: 1;
 }
 
+.bigtarget {
+  position: absolute;
+  width: 2%;
+  height: 2%;
+  background: red;
+  border: 1px solid #fff;
+  z-index: 1;
+}
+
 .controlButtons {
   margin: 0px 630px;
   background-color: #4caf50;

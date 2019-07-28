@@ -2,9 +2,15 @@ import React from "react";
 import { Component } from "react";
 import Snake from "./Snake";
 import Target from "./Target";
+import BigTarget from "./BigTarget";
 var bestScore = 0;
+var bodyLength = 0;
 var initState = {
   targetLocation: [
+    Math.floor((Math.random().toFixed(2) * 98) / 2) * 2,
+    Math.floor((Math.random().toFixed(2) * 98) / 2) * 2
+  ],
+  bigTargetLocation: [
     Math.floor((Math.random().toFixed(2) * 98) / 2) * 2,
     Math.floor((Math.random().toFixed(2) * 98) / 2) * 2
   ],
@@ -42,6 +48,7 @@ class App extends Component {
   componentDidUpdate() {
     this.bitItself();
     this.ifEaten();
+    // this.ifBigTargetIsEaten();
   }
 
   bitItself = () => {
@@ -58,13 +65,32 @@ class App extends Component {
       }
     });
   };
+  showBigTarget = () => {
+    this.setState({});
+  };
 
   ifEaten = () => {
     let head = this.state.snakeBody[this.state.snakeBody.length - 1];
     let target = this.state.targetLocation;
     let speed = this.state.speed;
     let score = this.state.score;
+    let bigTarget = this.state.bigTargetLocation;
+    if (head[0] == bigTarget[0] && head[1] == bigTarget[1]) {
+      score = score + 10;
+      if (score > bestScore) {
+        bestScore = score;
+      }
+      this.setState({
+        bigTargetLocation: [
+          Math.floor((Math.random().toFixed(2) * 100) / 2) * 2,
+          Math.floor((Math.random().toFixed(2) * 100) / 2) * 2
+        ],
+        score: score
+      });
+    }
     if (head[0] == target[0] && head[1] == target[1]) {
+      bodyLength = this.state.snakeBody.length;
+      console.log(bodyLength);
       let newBody = this.state.snakeBody;
       newBody.unshift([]);
       this.setState({
@@ -76,9 +102,13 @@ class App extends Component {
         bestScore = score;
       }
       if (speed < 50) {
-        speed = 20;
+        speed = 50;
       }
       clearInterval(this.state.gameState);
+
+      if (score % 10 == 0 && score != 0) {
+        this.showBigTarget();
+      }
 
       this.setState({
         targetLocation: [
@@ -149,11 +179,20 @@ class App extends Component {
   };
 
   render() {
+    let bt;
+    if (
+      bodyLength != 0 &&
+      bodyLength % 10 == 0 &&
+      bodyLength != this.state.snakeBody.length
+    ) {
+      bt = <BigTarget bigTarget={this.state.bigTargetLocation} />;
+    }
     return (
       <div>
         <div className="maze">
           <Snake snakeBody={this.state.snakeBody} />
           <Target target={this.state.targetLocation} />
+          {bt}
         </div>
         <div>
           <button className="controlButtons" onClick={this.playPause}>
