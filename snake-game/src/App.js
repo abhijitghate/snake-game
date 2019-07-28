@@ -19,7 +19,9 @@ var initState = {
   direction: "RIGHT",
   play_pause: true,
   gameState: "",
-  score: 0
+  score: 0,
+  showBigTarget: false,
+  targetsEaten: 0
 };
 class App extends Component {
   constructor(props) {
@@ -48,8 +50,15 @@ class App extends Component {
   componentDidUpdate() {
     this.bitItself();
     this.ifEaten();
-    // this.ifBigTargetIsEaten();
   }
+
+  showBigTarget = () => {
+    if ((this.state.snakeBody.length - 2) % 10 == 0 && this.state.score != 0) {
+      this.setState({
+        showBigTarget: true
+      });
+    }
+  };
 
   bitItself = () => {
     let body = [...this.state.snakeBody];
@@ -57,16 +66,10 @@ class App extends Component {
     body.pop();
     body.forEach(x => {
       if (head[0] == x[0] && head[1] == x[1]) {
-        console.log(true);
-        // console.log(body);
-        // console.log(head);
         clearInterval(this.state.gameState);
         this.setState(initState);
       }
     });
-  };
-  showBigTarget = () => {
-    this.setState({});
   };
 
   ifEaten = () => {
@@ -75,22 +78,24 @@ class App extends Component {
     let speed = this.state.speed;
     let score = this.state.score;
     let bigTarget = this.state.bigTargetLocation;
+
     if (head[0] == bigTarget[0] && head[1] == bigTarget[1]) {
       score = score + 10;
       if (score > bestScore) {
         bestScore = score;
       }
+
       this.setState({
         bigTargetLocation: [
           Math.floor((Math.random().toFixed(2) * 100) / 2) * 2,
           Math.floor((Math.random().toFixed(2) * 100) / 2) * 2
         ],
-        score: score
+        score: score,
+        targetsEaten: 0
       });
     }
     if (head[0] == target[0] && head[1] == target[1]) {
       bodyLength = this.state.snakeBody.length;
-      console.log(bodyLength);
       let newBody = this.state.snakeBody;
       newBody.unshift([]);
       this.setState({
@@ -105,9 +110,10 @@ class App extends Component {
         speed = 50;
       }
       clearInterval(this.state.gameState);
+      let targetsEaten = this.state.targetsEaten + 1;
 
-      if (score % 10 == 0 && score != 0) {
-        this.showBigTarget();
+      if (targetsEaten > 10) {
+        targetsEaten = 0;
       }
 
       this.setState({
@@ -117,7 +123,8 @@ class App extends Component {
         ],
         speed: speed,
         gameState: setInterval(this.moveSnake, speed),
-        score: score
+        score: score,
+        targetsEaten: targetsEaten
       });
     }
   };
@@ -180,11 +187,7 @@ class App extends Component {
 
   render() {
     let bt;
-    if (
-      bodyLength != 0 &&
-      bodyLength % 10 == 0 &&
-      bodyLength != this.state.snakeBody.length
-    ) {
+    if (this.state.targetsEaten == 10 && this.state.snakeBody.length > 2) {
       bt = <BigTarget bigTarget={this.state.bigTargetLocation} />;
     }
     return (
@@ -200,6 +203,7 @@ class App extends Component {
           </button>
           <p>Score:{this.state.score}</p>
           <p>Best Score:{bestScore}</p>
+          <p>this.state.targetsEaten:{this.state.targetsEaten}</p>
         </div>
       </div>
     );
